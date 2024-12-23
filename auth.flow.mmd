@@ -1,0 +1,43 @@
+graph TD
+    classDef service fill:#a8d5ff,stroke:#333,stroke-width:2px;
+    classDef event fill:#ffe0b2,stroke:#333,stroke-width:2px;
+    classDef database fill:#c8e6c9,stroke:#333,stroke-width:2px;
+    classDef client fill:#e1bee7,stroke:#333,stroke-width:2px;
+
+    Client[Client Application]:::client
+    Gateway[API Gateway]:::service
+    Auth[Auth Service]:::service
+    EventBus[Event Bus]:::service
+    Cache[(Auth Cache)]:::database
+    Service1[Service 1]:::service
+    Service2[Service 2]:::service
+    Service3[Service 3]:::service
+
+    Client -->|1. Request| Gateway
+    Gateway -->|2. Validate Token| Auth
+    Auth -->|3. Generate Token| Gateway
+    Auth -->|4. Publish Auth Event| EventBus
+    EventBus -->|5a. Update| Cache
+    EventBus -->|5b. Notify| Service1
+    EventBus -->|5c. Notify| Service2
+    EventBus -->|5d. Notify| Service3
+    Gateway -->|6. Forward Request| Service1
+    Gateway -->|6. Forward Request| Service2
+    Gateway -->|6. Forward Request| Service3
+
+    subgraph Authentication Flow
+        Client
+        Gateway
+        Auth
+    end
+
+    subgraph Event Distribution
+        EventBus
+        Cache
+    end
+
+    subgraph Microservices
+        Service1
+        Service2
+        Service3
+    end
